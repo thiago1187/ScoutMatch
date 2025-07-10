@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.scoutmatch.dto.JogadorMatchDTO;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/times")
 public class TimeController {
