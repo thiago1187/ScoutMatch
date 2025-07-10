@@ -1,19 +1,24 @@
 package com.scoutmatch.service;
 
+import com.scoutmatch.dto.JogadorMatchDTO;
+import com.scoutmatch.model.Jogador;
 import com.scoutmatch.model.Time;
+import com.scoutmatch.repository.JogadorRepository;
 import com.scoutmatch.repository.TimeRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeService {
 
     private final TimeRepository timeRepository;
+    private final JogadorRepository jogadorRepository;
 
-    public TimeService(TimeRepository timeRepository) {
+    public TimeService(TimeRepository timeRepository, JogadorRepository jogadorRepository) {
         this.timeRepository = timeRepository;
+        this.jogadorRepository = jogadorRepository;
     }
 
     public Time salvar(Time time) {
@@ -30,5 +35,53 @@ public class TimeService {
 
     public void deletar(Long id) {
         timeRepository.deleteById(id);
+    }
+
+    public List<JogadorMatchDTO> getMatches(Long timeId) {
+        Optional<Time> optionalTime = timeRepository.findById(timeId);
+        if (optionalTime.isEmpty()) return Collections.emptyList();
+
+        Time time = optionalTime.get();
+        List<Jogador> jogadores = jogadorRepository.findAll();
+
+        List<JogadorMatchDTO> matches = new ArrayList<>();
+
+        for (Jogador jogador : jogadores) {
+            int score = 0;
+            List<String> criterios = new ArrayList<>();
+
+            if (jogador.getPosicao().equalsIgnoreCase(time.getPosicaoDesejada())) {
+                score++;
+                criterios.add("posição");
+            }
+            if (jogador.getPernaBoa().equalsIgnoreCase(time.getPernaDesejada())) {
+                score++;
+                criterios.add("perna");
+            }
+            if (jogador.getMelhorSkill().equalsIgnoreCase(time.getSkillDesejada())) {
+                score++;
+                criterios.add("skill");
+            }
+            if (jogador.getEstiloDeJogo().equalsIgnoreCase(time.getEstiloProcurado())) {
+                score++;
+                criterios.add("estilo");
+            }
+            if (jogador.getIdade() >= time.getMinIdade() && jogador.getIdade() <= time.getMaxIdade()) {
+                score++;
+                criterios.add("idade");
+            }
+
+            if (score > 0) {
+                String frase = score == 5 ?
+                        "Muito compatível: " + String.join(", ", criterios) + " combinam com o time" :
+                        "Compatível: " + String.join(", ", criterios) + " combinam com o time";
+
+                matches.add(new JogadorMatchDTO(jogador.getNome(), score, frase));
+            }
+        }
+
+        return matches.stream()
+                .sorted(Comparator.comparingInt(JogadorMatchDTO::getCompatibilidade).reversed())
+                .collect(Collectors.toList());
     }
 }

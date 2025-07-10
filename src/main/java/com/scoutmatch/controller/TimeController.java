@@ -4,7 +4,7 @@ import com.scoutmatch.model.Time;
 import com.scoutmatch.service.TimeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.scoutmatch.dto.JogadorMatchDTO;
 import java.util.List;
 
 @RestController
@@ -32,6 +32,11 @@ public class TimeController {
         return timeService.buscarPorId(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/matches")
+    public ResponseEntity<List<JogadorMatchDTO>> buscarMatches(@PathVariable Long id) {
+        return ResponseEntity.ok(timeService.getMatches(id));
     }
 
     @DeleteMapping("/{id}")
