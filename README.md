@@ -1,9 +1,3 @@
-Sim, Thiago! Seu README está muito bom, bem completo e organizado. Mas com alguns ajustes de formatação e pequenos refinamentos, ele pode ficar ainda mais profissional e fluido.
-
-Aqui vai a versão revisada:
-
-⸻
-
 ⚽ ScoutMatch
 
 ScoutMatch é uma aplicação full stack que realiza o match entre jogadores de futebol e times, com base em critérios como posição, perna boa, estilo de jogo, skill e faixa etária.
