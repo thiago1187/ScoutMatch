@@ -1,8 +1,3 @@
-Ficou ótimo, Thiago! Mas tem pequenos ajustes de formatação e indentação que podem deixar o README.md ainda mais profissional. Abaixo está a versão corrigida e pronta para substituir no seu GitHub:
-
-⸻
-
-
 # ⚽ ScoutMatch
 
 **ScoutMatch** é uma aplicação backend desenvolvida com **Spring Boot** que realiza o match entre jogadores de futebol e times, baseado em critérios como posição, perna boa, estilo de jogo, skill e faixa etária.
