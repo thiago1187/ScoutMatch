@@ -1,37 +1,64 @@
-# ⚽ ScoutMatch
+Sim, Thiago! Seu README está muito bom, bem completo e organizado. Mas com alguns ajustes de formatação e pequenos refinamentos, ele pode ficar ainda mais profissional e fluido.
 
-**ScoutMatch** é uma aplicação backend desenvolvida com **Spring Boot** que realiza o match entre jogadores de futebol e times, baseado em critérios como posição, perna boa, estilo de jogo, skill e faixa etária.
+Aqui vai a versão revisada:
 
----
+⸻
 
-## 🚀 Tecnologias
+⚽ ScoutMatch
 
-- Java 17  
-- Spring Boot 3  
-- Spring Data JPA  
-- H2 Database (em memória)  
-- Postman (para testes da API)  
+ScoutMatch é uma aplicação full stack que realiza o match entre jogadores de futebol e times, com base em critérios como posição, perna boa, estilo de jogo, skill e faixa etária.
 
----
+⸻
 
-## 📦 Como rodar o projeto localmente
+🚀 Tecnologias
 
-1. **Clone o repositório**
-```bash
+🖥️ Backend
+	•	Java 17
+	•	Spring Boot 3
+	•	Spring Data JPA
+	•	H2 Database (em memória)
+	•	Postman (para testes da API)
+
+🌐 Frontend
+	•	React
+	•	Vite
+	•	Tailwind CSS
+	•	Fetch API (requisições HTTP)
+	•	React Hooks (useState, useEffect)
+
+⸻
+
+▶️ Como rodar o projeto localmente
+
+1. Clone o repositório
+
 git clone https://github.com/thiago1187/ScoutMatch.git
 cd ScoutMatch
 
-	2.	Abra o projeto na sua IDE (IntelliJ, VS Code, etc.)
-	3.	Execute a aplicação
+2. Abra o projeto na sua IDE
 
+(IntelliJ, VS Code, etc.)
+
+3. Execute a aplicação backend
 	•	Via terminal:
 
 ./mvnw spring-boot:run
 
-	•	Ou rode a classe ScoutMatchApplication.java
+	•	Ou rode a classe ScoutMatchApplication.java na sua IDE
 
-	4.	A aplicação estará disponível em:
-http://localhost:8080
+A aplicação estará disponível em:
+👉 http://localhost:8080
+
+⸻
+
+4. Execute o frontend
+
+cd frontend
+npm install
+npm run dev
+
+O frontend estará disponível em:
+👉 http://localhost:5173
 
 ⸻
 
@@ -40,8 +67,6 @@ http://localhost:8080
 🔹 Criar Jogador
 
 POST /jogadores
-
-Exemplo de corpo da requisição:
 
 {
   "nome": "Thiago Silva",
@@ -59,8 +84,6 @@ Exemplo de corpo da requisição:
 
 POST /times
 
-Exemplo de corpo da requisição:
-
 {
   "nome": "FC Recife",
   "posicaoDesejada": "Zagueiro",
@@ -74,7 +97,7 @@ Exemplo de corpo da requisição:
 
 ⸻
 
-🔹 Ver Matches para um Time
+🔹 Ver Matches de um Time
 
 GET /times/{id}/matches
 
@@ -98,15 +121,15 @@ Exemplo de retorno:
 
 🧠 Lógica de Match
 
-A lógica de compatibilidade avalia os seguintes critérios:
-	•	Posição
-	•	Perna boa
-	•	Melhor skill
-	•	Estilo de jogo
-	•	Faixa etária (mínima e máxima)
+A compatibilidade é calculada com base em até 5 critérios:
+	•	✅ Posição
+	•	✅ Perna boa
+	•	✅ Melhor skill
+	•	✅ Estilo de jogo
+	•	✅ Faixa etária (mínima e máxima)
 
 Cada critério compatível soma 1 ponto.
-Os jogadores são ordenados por pontuação, e o sistema retorna um resumo explicando o grau de compatibilidade.
+O sistema retorna os jogadores ordenados pela pontuação de compatibilidade, com um resumo explicativo.
 
 ⸻
 
