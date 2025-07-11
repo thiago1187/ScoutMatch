@@ -38,7 +38,7 @@ public class TimeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Time> atualizar(@PathVariable Long id, @RequestBody Time time) {
+    public ResponseEntity<Time> atualizar(@PathVariable Long id, @RequestBody @Valid Time time) {
         return timeService.atualizar(id, time)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
