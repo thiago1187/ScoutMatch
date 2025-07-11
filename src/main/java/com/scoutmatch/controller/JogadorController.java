@@ -2,6 +2,7 @@ package com.scoutmatch.controller;
 
 import com.scoutmatch.model.Jogador;
 import com.scoutmatch.service.JogadorService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ public class JogadorController {
     }
 
     @PostMapping
-    public ResponseEntity<Jogador> criar(@RequestBody Jogador jogador) {
+    public ResponseEntity<Jogador> criar(@RequestBody @Valid Jogador jogador) {
         return ResponseEntity.ok(jogadorService.salvar(jogador));
     }
 

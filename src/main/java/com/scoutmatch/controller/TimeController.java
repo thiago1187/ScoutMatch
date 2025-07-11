@@ -5,7 +5,6 @@ import com.scoutmatch.service.TimeService;
 import com.scoutmatch.dto.JogadorMatchDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
 import java.util.List;
 
