@@ -36,7 +36,7 @@ public class JogadorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Jogador> atualizar(@PathVariable Long id, @RequestBody Jogador jogador) {
+    public ResponseEntity<Jogador> atualizar(@PathVariable Long id, @RequestBody @Valid Jogador jogador) {
         return jogadorService.atualizar(id, jogador)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
