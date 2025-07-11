@@ -41,8 +41,7 @@ function App() {
       .then((r) => r.json())
       .then(setTimes)
       .catch(console.error);
-  },
-};
+  };
 
 const carregarJogadores = () => {
   fetch("http://localhost:8080/jogadores")
