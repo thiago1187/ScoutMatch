@@ -46,6 +46,13 @@ public class TimeController {
             .orElse(ResponseEntity.notFound().build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Time> atualizar(@PathVariable Long id, @RequestBody Time time) {
+        return timeService.atualizar(id, time)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{id}/matches")
     public ResponseEntity<List<JogadorMatchDTO>> buscarMatches(@PathVariable Long id) {
         return ResponseEntity.ok(timeService.getMatches(id));

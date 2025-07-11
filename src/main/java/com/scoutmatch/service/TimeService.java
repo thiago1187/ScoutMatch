@@ -36,6 +36,21 @@ public class TimeService {
         return timeRepository.findById(id);
     }
 
+    
+    public Optional<Time> atualizar(Long id, Time time) {
+        return timeRepository.findById(id)
+            .map(existing -> {
+                existing.setNome(time.getNome());
+                existing.setPosicaoDesejada(time.getPosicaoDesejada());
+                existing.setPernaDesejada(time.getPernaDesejada());
+                existing.setSkillDesejada(time.getSkillDesejada());
+                existing.setEstiloProcurado(time.getEstiloProcurado());
+                existing.setMinIdade(time.getMinIdade());
+                existing.setMaxIdade(time.getMaxIdade());
+                return timeRepository.save(existing);
+            });
+    }
+
     public void deletar(Long id) {
         timeRepository.deleteById(id);
     }
@@ -79,7 +94,7 @@ public class TimeService {
                         "Muito compatível: " + String.join(", ", criterios) + " combinam com o time" :
                         "Compatível: " + String.join(", ", criterios) + " combinam com o time";
 
-                matches.add(new JogadorMatchDTO(jogador.getNome(), score, frase));
+                        matches.add(new JogadorMatchDTO(jogador.getId(), jogador.getNome(), score, frase));
             }
         }
 
