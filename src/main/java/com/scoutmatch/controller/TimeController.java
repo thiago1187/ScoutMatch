@@ -2,9 +2,11 @@ package com.scoutmatch.controller;
 
 import com.scoutmatch.model.Time;
 import com.scoutmatch.service.TimeService;
+import com.scoutmatch.dto.JogadorMatchDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.scoutmatch.dto.JogadorMatchDTO;
+
+import jakarta.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -19,8 +21,18 @@ public class TimeController {
     }
 
     @PostMapping
-    public ResponseEntity<Time> criar(@RequestBody Time time) {
+    public ResponseEntity<Time> criar(@RequestBody @Valid Time time) {
         return ResponseEntity.ok(timeService.salvar(time));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Time> editar(@PathVariable Long id, @RequestBody @Valid Time novoTime) {
+        return timeService.buscarPorId(id)
+            .map(timeExistente -> {
+                novoTime.setId(id); // garante que o ID do body será o mesmo do path
+                return ResponseEntity.ok(timeService.salvar(novoTime));
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping

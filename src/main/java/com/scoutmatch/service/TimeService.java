@@ -22,6 +22,9 @@ public class TimeService {
     }
 
     public Time salvar(Time time) {
+        if (time.getMinIdade() > time.getMaxIdade()) {
+            throw new IllegalArgumentException("minIdade cannot be greater than maxIdade");
+        }
         return timeRepository.save(time);
     }
 

@@ -1,6 +1,8 @@
 package com.scoutmatch.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 @Entity
@@ -18,6 +20,10 @@ public class Time {
     private String pernaDesejada;
     private String skillDesejada;
     private String estiloProcurado;
+    @Min(15)
+    @Max(50)
     private int minIdade;
+    @Min(15)
+    @Max(50)
     private int maxIdade;
 }
