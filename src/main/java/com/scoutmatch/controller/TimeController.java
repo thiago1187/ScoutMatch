@@ -24,15 +24,6 @@ public class TimeController {
         return ResponseEntity.ok(timeService.salvar(time));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Time> editar(@PathVariable Long id, @RequestBody @Valid Time novoTime) {
-        return timeService.buscarPorId(id)
-            .map(timeExistente -> {
-                novoTime.setId(id); // garante que o ID do body será o mesmo do path
-                return ResponseEntity.ok(timeService.salvar(novoTime));
-            })
-            .orElse(ResponseEntity.notFound().build());
-    }
 
     @GetMapping
     public ResponseEntity<List<Time>> listarTodos() {

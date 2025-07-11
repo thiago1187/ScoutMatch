@@ -40,6 +40,9 @@ public class TimeService {
     public Optional<Time> atualizar(Long id, Time time) {
         return timeRepository.findById(id)
             .map(existing -> {
+                if (time.getMinIdade() > time.getMaxIdade()) {
+                    throw new IllegalArgumentException("minIdade cannot be greater than maxIdade");
+                }
                 existing.setNome(time.getNome());
                 existing.setPosicaoDesejada(time.getPosicaoDesejada());
                 existing.setPernaDesejada(time.getPernaDesejada());
