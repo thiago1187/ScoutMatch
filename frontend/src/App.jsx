@@ -48,6 +48,7 @@ const carregarJogadores = () => {
     .then((r) => r.json())
     .then(setJogadores)
     .catch(console.error);
+    if (selectedTimeId) fetch(`http://localhost:8080/times/${selectedTimeId}/matches`).then(r => r.json()).then(setMatches).catch(console.error);
 };
 
 // ---------- efeitos ----------
@@ -108,6 +109,7 @@ useEffect(carregarJogadores, []);
         estiloDeJogo: "", idade: "",
       });
       carregarJogadores();
+      if (selectedTimeId) fetch(`http://localhost:8080/times/${selectedTimeId}/matches`).then(r => r.json()).then(setMatches).catch(console.error);
     } catch (err) {
       console.error(err);
       alert("Erro ao criar jogador (veja console).");
@@ -127,6 +129,7 @@ useEffect(carregarJogadores, []);
     if (!confirm("Excluir jogador?")) return;
     await fetch(`http://localhost:8080/jogadores/${id}`, { method: "DELETE" });
     carregarJogadores();
+    if (selectedTimeId) fetch(`http://localhost:8080/times/${selectedTimeId}/matches`).then(r => r.json()).then(setMatches).catch(console.error);
   };
 
   const handleUpdateTime = async (e) => {
@@ -155,6 +158,7 @@ useEffect(carregarJogadores, []);
     if (res.ok) {
       setEditingJogador(null);
       carregarJogadores();
+      if (selectedTimeId) fetch(`http://localhost:8080/times/${selectedTimeId}/matches`).then(r => r.json()).then(setMatches).catch(console.error);
     } else {
       alert("Erro ao atualizar jogador");
     }
