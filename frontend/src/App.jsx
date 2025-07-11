@@ -25,6 +25,9 @@ function App() {
     idade: "",
   });
 
+  const [jogadores, setJogadores] = useState([]);
+  const [editingTime, setEditingTime] = useState(null);
+  const [editingJogador, setEditingJogador] = useState(null);
   // ---------- opções fixas ----------
   const posicoes = ["Goleiro", "Zagueiro", "Lateral", "Meio-Campo", "Atacante"];
   const pernas   = ["Direita", "Esquerda", "Ambidestro"];
@@ -33,13 +36,24 @@ function App() {
 
   const camposPreenchidos = (obj) => Object.values(obj).every((v) => v !== "");
 
-  // ---------- efeitos ----------
-  useEffect(() => {
+  const carregarTimes = () => {
     fetch("http://localhost:8080/times")
       .then((r) => r.json())
       .then(setTimes)
       .catch(console.error);
-  }, []);
+  },
+};
+
+const carregarJogadores = () => {
+  fetch("http://localhost:8080/jogadores")
+    .then((r) => r.json())
+    .then(setJogadores)
+    .catch(console.error);
+};
+
+// ---------- efeitos ----------
+useEffect(carregarTimes, []);
+useEffect(carregarJogadores, []);
 
   useEffect(() => {
     if (!selectedTimeId) return;
@@ -62,8 +76,8 @@ function App() {
       });
       if (!res.ok) throw new Error(await res.text());
 
-      const novo = await res.json();
-      setTimes((prev) => [...prev, novo]);
+      await res.json();
+      carregarTimes();
       alert("Time criado com sucesso!");
       setTimeForm({
         nome: "", posicaoDesejada: "", pernaDesejada: "", skillDesejada: "",
@@ -94,9 +108,56 @@ function App() {
         nome: "", posicao: "", pernaBoa: "", melhorSkill: "",
         estiloDeJogo: "", idade: "",
       });
+      carregarJogadores();
     } catch (err) {
       console.error(err);
       alert("Erro ao criar jogador (veja console).");
+    }
+  };
+  const handleDeleteTime = async (id) => {
+    if (!confirm("Excluir time?")) return;
+    await fetch(`http://localhost:8080/times/${id}`, { method: "DELETE" });
+    carregarTimes();
+    if (String(id) === selectedTimeId) {
+      setSelectedTimeId("");
+      setMatches([]);
+    }
+  };
+
+  const handleDeleteJogador = async (id) => {
+    if (!confirm("Excluir jogador?")) return;
+    await fetch(`http://localhost:8080/jogadores/${id}`, { method: "DELETE" });
+    carregarJogadores();
+  };
+
+  const handleUpdateTime = async (e) => {
+    e.preventDefault();
+    const res = await fetch(`http://localhost:8080/times/${editingTime.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editingTime),
+    });
+    if (res.ok) {
+      setEditingTime(null);
+      carregarTimes();
+    } else {
+      alert("Erro ao atualizar time");
+    }
+  };
+
+  const handleUpdateJogador = async (e) => {
+    e.preventDefault();
+    const payload = { ...editingJogador, idade: Number(editingJogador.idade) };
+    const res = await fetch(`http://localhost:8080/jogadores/${editingJogador.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      setEditingJogador(null);
+      carregarJogadores();
+    } else {
+      alert("Erro ao atualizar jogador");
     }
   };
 
@@ -143,6 +204,35 @@ function App() {
           </table>
         </div>
       )}
+
+      {/* lista de times */}
+      <div className="bg-white shadow rounded p-4 w-full max-w-2xl mb-8">
+        <h2 className="font-bold mb-2">Times</h2>
+        {times.map((t) => (
+          <div key={t.id} className="flex justify-between border-b py-1">
+            <span>{t.nome}</span>
+            <div>
+              <button onClick={() => setEditingTime({ ...t })} className="text-blue-600 mr-2">Editar</button>
+              <button onClick={() => handleDeleteTime(t.id)} className="text-red-600">Excluir</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* lista de jogadores */}
+      <div className="bg-white shadow rounded p-4 w-full max-w-2xl mb-8">
+        <h2 className="font-bold mb-2">Jogadores</h2>
+        {jogadores.map((j) => (
+          <div key={j.id} className="flex justify-between border-b py-1">
+            <span>{j.nome}</span>
+            <div>
+              <button onClick={() => setEditingJogador({ ...j })} className="text-blue-600 mr-2">Editar</button>
+              <button onClick={() => handleDeleteJogador(j.id)} className="text-red-600">Excluir</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
 
       {/* formulário de time */}
       <form onSubmit={handleSubmitTime} className="bg-white shadow rounded p-6 w-full max-w-2xl mb-8">
@@ -224,6 +314,76 @@ function App() {
           Criar Jogador
         </button>
       </form>
+      
+      {editingTime && (
+        <div className="modal-overlay">
+          <form onSubmit={handleUpdateTime} className="modal">
+            <h2 className="text-xl font-bold mb-4">Editar Time</h2>
+            <input className="input" value={editingTime.nome}
+              onChange={(e) => setEditingTime({ ...editingTime, nome: e.target.value })} />
+            <select className="input" value={editingTime.posicaoDesejada}
+              onChange={(e) => setEditingTime({ ...editingTime, posicaoDesejada: e.target.value })}>
+              <option value="">Posição desejada</option>
+              {posicoes.map(p => <option key={p}>{p}</option>)}
+            </select>
+            <select className="input" value={editingTime.pernaDesejada}
+              onChange={(e) => setEditingTime({ ...editingTime, pernaDesejada: e.target.value })}>
+              <option value="">Perna desejada</option>
+              {pernas.map(p => <option key={p}>{p}</option>)}
+            </select>
+            <select className="input" value={editingTime.skillDesejada}
+              onChange={(e) => setEditingTime({ ...editingTime, skillDesejada: e.target.value })}>
+              <option value="">Skill desejada</option>
+              {skills.map(s => <option key={s}>{s}</option>)}
+            </select>
+            <select className="input" value={editingTime.estiloProcurado}
+              onChange={(e) => setEditingTime({ ...editingTime, estiloProcurado: e.target.value })}>
+              <option value="">Estilo procurado</option>
+              {estilos.map(s => <option key={s}>{s}</option>)}
+            </select>
+            <input className="input" type="number" value={editingTime.minIdade}
+              onChange={(e) => setEditingTime({ ...editingTime, minIdade: e.target.value })} placeholder="Idade mínima" />
+            <input className="input" type="number" value={editingTime.maxIdade}
+              onChange={(e) => setEditingTime({ ...editingTime, maxIdade: e.target.value })} placeholder="Idade máxima" />
+            <button className="w-full bg-blue-500 text-white py-2 rounded">Salvar</button>
+            <button type="button" onClick={() => setEditingTime(null)} className="w-full mt-2 bg-gray-300 py-2 rounded">Cancelar</button>
+          </form>
+        </div>
+      )}
+
+      {editingJogador && (
+        <div className="modal-overlay">
+          <form onSubmit={handleUpdateJogador} className="modal">
+            <h2 className="text-xl font-bold mb-4">Editar Jogador</h2>
+            <input className="input" value={editingJogador.nome}
+              onChange={(e) => setEditingJogador({ ...editingJogador, nome: e.target.value })} />
+            <select className="input" value={editingJogador.posicao}
+              onChange={(e) => setEditingJogador({ ...editingJogador, posicao: e.target.value })}>
+              <option value="">Posição</option>
+              {posicoes.map(p => <option key={p}>{p}</option>)}
+            </select>
+            <select className="input" value={editingJogador.pernaBoa}
+              onChange={(e) => setEditingJogador({ ...editingJogador, pernaBoa: e.target.value })}>
+              <option value="">Perna boa</option>
+              {pernas.map(p => <option key={p}>{p}</option>)}
+            </select>
+            <select className="input" value={editingJogador.melhorSkill}
+              onChange={(e) => setEditingJogador({ ...editingJogador, melhorSkill: e.target.value })}>
+              <option value="">Melhor Skill</option>
+              {skills.map(s => <option key={s}>{s}</option>)}
+            </select>
+            <select className="input" value={editingJogador.estiloDeJogo}
+              onChange={(e) => setEditingJogador({ ...editingJogador, estiloDeJogo: e.target.value })}>
+              <option value="">Estilo de jogo</option>
+              {estilos.map(s => <option key={s}>{s}</option>)}
+            </select>
+            <input className="input" type="number" value={editingJogador.idade}
+              onChange={(e) => setEditingJogador({ ...editingJogador, idade: e.target.value })} placeholder="Idade" />
+            <button className="w-full bg-green-500 text-white py-2 rounded">Salvar</button>
+            <button type="button" onClick={() => setEditingJogador(null)} className="w-full mt-2 bg-gray-300 py-2 rounded">Cancelar</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
