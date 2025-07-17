@@ -131,6 +131,46 @@ const ScoutMatchDashboard = () => {
     .catch(() => alert('Erro ao criar jogador'));
   };
 
+  const handleEditPlayer = (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const jogadorEditado = Object.fromEntries(data);
+    jogadorEditado.idade = parseInt(jogadorEditado.idade);
+    jogadorEditado.avatar = getAvatarBySkill(jogadorEditado.melhorSkill);
+    
+    fetch(`http://localhost:8080/jogadores/${editingJogador.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jogadorEditado),
+    })
+    .then(() => {
+      alert('Jogador editado!');
+      setEditingJogador(null);
+      setViewMode('players');
+      // Recarregar lista de jogadores
+      fetch('http://localhost:8080/jogadores')
+        .then((res) => res.json())
+        .then((data) => setPlayers(data));
+    })
+    .catch(() => alert('Erro ao editar jogador'));
+  };
+
+  const handleDeletePlayer = (playerId) => {
+    if (confirm('Tem certeza que deseja excluir este jogador?')) {
+      fetch(`http://localhost:8080/jogadores/${playerId}`, {
+        method: 'DELETE',
+      })
+      .then(() => {
+        alert('Jogador excluído!');
+        // Recarregar lista de jogadores
+        fetch('http://localhost:8080/jogadores')
+          .then((res) => res.json())
+          .then((data) => setPlayers(data));
+      })
+      .catch(() => alert('Erro ao excluir jogador'));
+    }
+  };
+
   const handleAddTeam = (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
@@ -153,6 +193,48 @@ const ScoutMatchDashboard = () => {
         .then((data) => setTeams(data));
     })
     .catch(() => alert('Erro ao criar time'));
+  };
+
+  const handleEditTeam = (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const timeEditado = Object.fromEntries(data);
+    timeEditado.minIdade = parseInt(timeEditado.minIdade);
+    timeEditado.maxIdade = parseInt(timeEditado.maxIdade);
+    timeEditado.logo = "🏆";
+    timeEditado.cidade = "São Paulo";
+    
+    fetch(`http://localhost:8080/times/${editingTime.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(timeEditado),
+    })
+    .then(() => {
+      alert('Time editado!');
+      setEditingTime(null);
+      setViewMode('teams');
+      // Recarregar lista de times
+      fetch('http://localhost:8080/times')
+        .then((res) => res.json())
+        .then((data) => setTeams(data));
+    })
+    .catch(() => alert('Erro ao editar time'));
+  };
+
+  const handleDeleteTeam = (teamId) => {
+    if (confirm('Tem certeza que deseja excluir este time?')) {
+      fetch(`http://localhost:8080/times/${teamId}`, {
+        method: 'DELETE',
+      })
+      .then(() => {
+        alert('Time excluído!');
+        // Recarregar lista de times
+        fetch('http://localhost:8080/times')
+          .then((res) => res.json())
+          .then((data) => setTeams(data));
+      })
+      .catch(() => alert('Erro ao excluir time'));
+    }
   };
 
   const PlayerCard = ({ player, showCompatibility = false, team = null }) => {
@@ -228,6 +310,24 @@ const ScoutMatchDashboard = () => {
             </div>
           </div>
         )}
+        
+        {/* Botões de ação - só aparecem na aba jogadores */}
+        {viewMode === 'players' && (
+          <div className="mt-4 pt-3 border-t flex gap-2">
+            <button
+              onClick={() => setEditingJogador(player)}
+              className="flex-1 px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => handleDeletePlayer(player.id)}
+              className="flex-1 px-3 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
+            >
+              Excluir
+            </button>
+          </div>
+        )}
       </div>
     );
   };
@@ -281,6 +381,30 @@ const ScoutMatchDashboard = () => {
           {getMatchesForTeam(team.id).filter(p => p.compatibility.score >= 3).length} matches
         </span>
       </div>
+      
+      {/* Botões de ação - só aparecem na aba times */}
+      {viewMode === 'teams' && (
+        <div className="mt-4 pt-3 border-t flex gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditingTime(team);
+            }}
+            className="flex-1 px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+          >
+            Editar
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteTeam(team.id);
+            }}
+            className="flex-1 px-3 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
+          >
+            Excluir
+          </button>
+        </div>
+      )}
     </div>
   );
 
@@ -554,6 +678,60 @@ const ScoutMatchDashboard = () => {
           </div>
         )}
 
+        {editingJogador && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Editar Jogador</h2>
+              <button
+                onClick={() => setEditingJogador(null)}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+            <form
+              onSubmit={handleEditPlayer}
+              className="bg-white p-6 rounded-xl shadow-lg space-y-4 max-w-xl"
+            >
+              <input name="nome" required placeholder="Nome" defaultValue={editingJogador.nome} className="w-full p-2 border rounded" />
+              <input name="nacionalidade" required placeholder="Nacionalidade" defaultValue={editingJogador.nacionalidade} className="w-full p-2 border rounded" />
+              <input name="idade" type="number" required placeholder="Idade" defaultValue={editingJogador.idade} className="w-full p-2 border rounded" />
+              
+              <select name="posicao" required defaultValue={editingJogador.posicao} className="w-full p-2 border rounded">
+                <option value="">Selecione uma posição</option>
+                {posicoes.map(pos => (
+                  <option key={pos} value={pos}>{pos}</option>
+                ))}
+              </select>
+              
+              <select name="pernaBoa" required defaultValue={editingJogador.pernaBoa} className="w-full p-2 border rounded">
+                <option value="">Selecione a perna boa</option>
+                {pernas.map(perna => (
+                  <option key={perna} value={perna}>{perna}</option>
+                ))}
+              </select>
+              
+              <select name="melhorSkill" required defaultValue={editingJogador.melhorSkill} className="w-full p-2 border rounded">
+                <option value="">Selecione a melhor skill</option>
+                {skills.map(skill => (
+                  <option key={skill} value={skill}>{skill}</option>
+                ))}
+              </select>
+              
+              <select name="estiloDeJogo" required defaultValue={editingJogador.estiloDeJogo} className="w-full p-2 border rounded">
+                <option value="">Selecione o estilo de jogo</option>
+                {estilos.map(estilo => (
+                  <option key={estilo} value={estilo}>{estilo}</option>
+                ))}
+              </select>
+              
+              <input name="altura" placeholder="Altura (ex: 1.80m)" defaultValue={editingJogador.altura} className="w-full p-2 border rounded" />
+              <input name="peso" placeholder="Peso (ex: 75kg)" defaultValue={editingJogador.peso} className="w-full p-2 border rounded" />
+              <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Atualizar Jogador</button>
+            </form>
+          </div>
+        )}
+
         {viewMode === 'addTeam' && (
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Novo Time</h2>
@@ -595,6 +773,59 @@ const ScoutMatchDashboard = () => {
               <input name="minIdade" type="number" required placeholder="Idade mínima" className="w-full p-2 border rounded" />
               <input name="maxIdade" type="number" required placeholder="Idade máxima" className="w-full p-2 border rounded" />
               <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">Salvar Time</button>
+            </form>
+          </div>
+        )}
+
+        {editingTime && (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">Editar Time</h2>
+              <button
+                onClick={() => setEditingTime(null)}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+            <form
+              onSubmit={handleEditTeam}
+              className="bg-white p-6 rounded-xl shadow-lg space-y-4 max-w-xl"
+            >
+              <input name="nome" required placeholder="Nome do Time" defaultValue={editingTime.nome} className="w-full p-2 border rounded" />
+              <input name="fundacao" required placeholder="Fundação (ex: 1999)" defaultValue={editingTime.fundacao} className="w-full p-2 border rounded" />
+              
+              <select name="posicaoDesejada" required defaultValue={editingTime.posicaoDesejada} className="w-full p-2 border rounded">
+                <option value="">Selecione a posição desejada</option>
+                {posicoes.map(pos => (
+                  <option key={pos} value={pos}>{pos}</option>
+                ))}
+              </select>
+              
+              <select name="pernaDesejada" required defaultValue={editingTime.pernaDesejada} className="w-full p-2 border rounded">
+                <option value="">Selecione a perna desejada</option>
+                {pernas.map(perna => (
+                  <option key={perna} value={perna}>{perna}</option>
+                ))}
+              </select>
+              
+              <select name="skillDesejada" required defaultValue={editingTime.skillDesejada} className="w-full p-2 border rounded">
+                <option value="">Selecione a skill desejada</option>
+                {skills.map(skill => (
+                  <option key={skill} value={skill}>{skill}</option>
+                ))}
+              </select>
+              
+              <select name="estiloProcurado" required defaultValue={editingTime.estiloProcurado} className="w-full p-2 border rounded">
+                <option value="">Selecione o estilo procurado</option>
+                {estilos.map(estilo => (
+                  <option key={estilo} value={estilo}>{estilo}</option>
+                ))}
+              </select>
+              
+              <input name="minIdade" type="number" required placeholder="Idade mínima" defaultValue={editingTime.minIdade} className="w-full p-2 border rounded" />
+              <input name="maxIdade" type="number" required placeholder="Idade máxima" defaultValue={editingTime.maxIdade} className="w-full p-2 border rounded" />
+              <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Atualizar Time</button>
             </form>
           </div>
         )}

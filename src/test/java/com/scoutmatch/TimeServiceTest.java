@@ -27,7 +27,7 @@ class TimeServiceTest {
 
     @Test
     void atualizarThrowsWhenMinGreaterThanMax() {
-        Time existing = new Time(1L, "A", "B", "C", "D", "E", 20, 30);
+        Time existing = new Time(1L, "A", "B", "C", "D", "E", "G", 20, 30);
         when(timeRepository.findById(1L)).thenReturn(Optional.of(existing));
 
         Time update = new Time();

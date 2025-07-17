@@ -31,6 +31,9 @@ public class Time {
     @NotBlank
     private String estiloProcurado;
     
+    @NotBlank
+    private String fundacao;
+    
     @Min(15)
     @Max(50)
     private int minIdade;

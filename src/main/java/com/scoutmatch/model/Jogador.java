@@ -15,16 +15,31 @@ public class Jogador {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @NotBlank
     private String nome;
+
     @NotBlank
     private String posicao;
+
     @NotBlank
     private String pernaBoa;
+
     @NotBlank
     private String melhorSkill;
+
     @NotBlank
     private String estiloDeJogo;
+
+    @NotBlank
+    private String nacionalidade;
+
+    @NotBlank
+    private String altura;
+
+    @NotBlank
+    private String peso;
+
     @Min(15)
     @Max(50)
     private int idade;
